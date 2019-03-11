@@ -1,3 +1,7 @@
 baseURL = "https://dmitriy5181.github.io/"
 title = "— the pragmatic approach"
 theme = "hugo-journal"
+
+# see https://gohugo.io/getting-started/configuration/#configure-front-matter
+[frontmatter]
+    date  = [":filename", ":default"]

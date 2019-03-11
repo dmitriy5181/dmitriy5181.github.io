@@ -1,5 +1,5 @@
 all:
-	@echo "dummy default target, use 'make install'"
+	@echo "dummy default target, use 'make publish'"
 
 publish:
 	rm -rf public

@@ -1,6 +1,5 @@
 ---
 title: "How to setup reliable ssh tunnel"
-date: 2019-01-09
 ---
 
 Used tools are autossh and systemd user unit. Might be useful for Raspberry Pi in combination with http://serveo.net
