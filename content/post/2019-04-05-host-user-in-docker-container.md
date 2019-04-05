@@ -1,0 +1,21 @@
+---
+title: "Host user in Docker container"
+---
+
+With bind mount, a directory on *host* machine is mounted into a container. And files in that folder created by process from the container will have owner name and group set to that process's name and group (such as *root*).
+
+Which is inconvenient since host user will not be able to change such files. To avoid this issue user with the *UID* and *GID* same to host user should exist inside container. Next commands in Dockerfile will do that:
+
+```
+ARG UID
+ARG GID
+
+RUN addgroup --system --gid $GID host-group
+RUN adduser --system --disabled-password --shell /bin/bash --uid $UID --gid $GID host-user
+```
+
+Corresponding values should be provided during build:
+
+    $ docker build --build-arg UID=$UID --build-arg GID=$GID .
+
+User with the name *host-user* will exist inside container. And any files created by this user will look exactly the same like created by local user.
