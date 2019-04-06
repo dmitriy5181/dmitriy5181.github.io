@@ -13,6 +13,10 @@ Create skeleton for the *deb-package*. As a result the *debian* directory with t
     $ DEBEMAIL=test@example.com DEBFULLNAME=Test debmake --native --package test --upstreamversion 1.0.0 --revision 1
     $ find debian -not -name debian -not -name control -not -name copyright -not -name changelog -not -name rules -not -name compat -not -path \*source\* -delete
 
+To build and install a package which will depends on all build-dependencies:
+
+    # mk-build-deps --install --remove
+
 To build binary package (`-b` option) without signing the *.changes* file (`-uc` option). Created deb-package will be in one directory up:
 
     $ dpkg-buildpackage -uc -b
