@@ -21,7 +21,7 @@ Managing the Debian packages repository can be done with the `reprepro`. Assumin
 
 ```
 Codename: stretch
-Architectures: source amd64 armhf
+Architectures: amd64
 Components: main
 ```
 
