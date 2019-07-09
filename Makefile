@@ -4,4 +4,4 @@ all:
 publish:
 	rm -rf public
 	hugo
-	ghp-import --branch=master --message="Generate site" --push public
+	python3 -m ghp_import --branch=master --message="Generate site" --push public
