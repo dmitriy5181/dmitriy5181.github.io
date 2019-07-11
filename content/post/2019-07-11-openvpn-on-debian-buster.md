@@ -75,6 +75,15 @@ Start service:
 
     # systemctl start openvpn-client@<client-name>
 
+### Routing all client traffic through the VPN
+
+To implement this the directive `redirect-gateway def1` should be set for client. It can be done either for only specific client(s) via client's configuration or for all clients at once via server's configuration. By using this directive the server need to be configured to deal with client traffic. To NAT the VPN client traffic to the Internet:
+
+    # iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
+
+Command assumes that the VPN subnet is *10.8.0.0/24* (taken from the server directive in the OpenVPN server configuration) and that the local ethernet interface is *eth0*. To persist this settings the *iptables-persistent* package can be used.
+
 ### Links
 
  * https://www.digitalocean.com/community/tutorials/how-to-set-up-an-openvpn-server-on-debian-9
+ * https://openvpn.net/community-resources/how-to
