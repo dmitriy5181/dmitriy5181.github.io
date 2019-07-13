@@ -1,0 +1,18 @@
+kind: pipeline
+name: default
+
+steps:
+  - name: build
+    image: dmitriy5181/hugo
+    volumes:
+      - name: www
+        path: /var/www/blog
+    commands:
+      - hugo
+      - find /var/www/blog -type f -delete
+      - cp -r public/. /var/www/blog
+
+volumes:
+- name: www
+  host:
+    path: /var/www/blog
