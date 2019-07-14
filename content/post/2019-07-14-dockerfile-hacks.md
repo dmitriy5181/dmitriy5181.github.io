@@ -1,6 +1,8 @@
 ---
-title: "Host user in Docker container"
+title: "Dockerfile hacks"
 ---
+
+**Host user in Docker container**
 
 With bind mount, a directory on *host* machine is mounted into a container. And files in that folder created by process from the container will have owner name and group set to that process's name and group (such as *root*).
 
@@ -19,3 +21,19 @@ Corresponding values should be provided during build:
     $ docker build --build-arg UID=$UID --build-arg GID=$GID .
 
 User with the name *host-user* will exist inside container. And any files created by this user will look exactly the same like created by local user.
+
+**Alternative BASEIMAGE**
+
+Might be useful to build images for more then one CPU architecture with the same Dockerfile. Next commands will allow to specify base image during build:
+
+```
+ARG BASEIMAGE=debian:stretch-slim
+
+FROM $BASEIMAGE
+```
+
+By default, build will use *amd64* architecture. And to build image for *armhf* (Raspberry Pi):
+
+```
+$ docker build --build-arg BASEIMAGE=resin/rpi-raspbian:stretch .
+```
