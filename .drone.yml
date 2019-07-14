@@ -8,9 +8,8 @@ steps:
       - name: www
         path: /var/www/blog
     commands:
-      - hugo
       - find /var/www/blog -type f -delete
-      - cp -r public/. /var/www/blog
+      - hugo --destination /var/www/blog
 
 volumes:
 - name: www
