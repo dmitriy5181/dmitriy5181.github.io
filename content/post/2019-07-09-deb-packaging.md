@@ -7,7 +7,7 @@ title: "The simplest possible Debian packaging"
 Basic skeleton for the Debian-package can be build with the help of `debmake`. As a result the *debian* directory with the minimal set of required files will be created:
 
     $ DEBEMAIL=test@example.com DEBFULLNAME=Test debmake --native --package test --upstreamversion 1.0.0 --revision 1
-    $ find debian -not -name debian -not -name control -not -name copyright -not -name changelog -not -name rules -not -name compat -not -path \*source\* -delete
+    $ find debian -type f -not -name control -not -name copyright -not -name changelog -not -name rules -not -name compat -not -name format -delete
 
 To build binary package (`-b`) without signing the *.changes* file (`-uc`):
 
