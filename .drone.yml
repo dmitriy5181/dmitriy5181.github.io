@@ -3,7 +3,7 @@ name: default
 
 steps:
   - name: build
-    image: dmitriy5181/hugo
+    image: github.com/gohugoio/hugo.git#v0.55.6
     volumes:
       - name: www
         path: /var/www/blog
