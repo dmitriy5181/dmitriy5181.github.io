@@ -4,15 +4,19 @@ title: "Secure Drone CI with HTTPS-enabled Nginx as reverse proxy"
 
 **Prerequisites**
 
-Installed Nginx and Certbot:
+Nginx and Certbot supposed to be installed. If not:
 
     # apt install nginx python-certbot-nginx
 
-Nginx "server block" (analog of "virtual host" in Apache) configured and enabled:
+Configure and enable Nginx "server block" (analog of "virtual host" in Apache):
 
     # vim /etc/nginx/sites-available/example.com
     ...
     # ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
+
+To check Nginx configuration before enabling it, run:
+
+    # nginx -t
 
 **Obtain SSL certificate and reconfigure Nginx**
 

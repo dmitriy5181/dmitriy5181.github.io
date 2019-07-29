@@ -11,6 +11,17 @@ steps:
       - find /var/www/blog -type f -delete
       - hugo --destination /var/www/blog
 
+  - name: notify
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
+      channel: general
+    when:
+      status:
+        - success
+        - failure
+
 volumes:
 - name: www
   host:
