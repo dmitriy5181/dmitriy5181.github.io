@@ -12,11 +12,14 @@ steps:
       - hugo --destination /var/www/blog
 
   - name: notify
-    image: plugins/slack
+    image: drillster/drone-email
     settings:
-      webhook:
-        from_secret: slack_webhook
-      channel: general
+      from: "Drone CI <drone@prgm.xyz>"
+      host: prgm.xyz
+      username:
+        from_secret: email_username
+      password:
+        from_secret: email_password
     when:
       status:
         - success
