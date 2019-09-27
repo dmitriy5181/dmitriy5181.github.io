@@ -12,8 +12,8 @@ Which is inconvenient since host user will not be able to change such files. To 
 ARG UID
 ARG GID
 
-RUN addgroup --system --gid $GID host-group
-RUN adduser --system --disabled-password --shell /bin/bash --uid $UID --gid $GID host-user
+RUN addgroup --gid $GID host-group
+RUN adduser --disabled-password --gecos "" --uid $UID --gid $GID host-user
 ```
 
 Corresponding values should be provided during build:
