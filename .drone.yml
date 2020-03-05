@@ -4,12 +4,19 @@ name: default
 steps:
   - name: build
     image: dmitriy5181/hugo
-    volumes:
-      - name: www
-        path: /var/www/blog
     commands:
-      - find /var/www/blog -type f -delete
-      - hugo --destination /var/www/blog
+      - hugo
+
+  - name: publish
+    image: appleboy/drone-scp
+    settings:
+      host: prgm.xyz
+      user: pi
+      key:
+        from_secret: ssh_key
+      overwrite: true
+      source: "public/*"
+      target: /var/www/blog
 
   - name: notify
     image: drillster/drone-email
@@ -24,8 +31,3 @@ steps:
       status:
         - success
         - failure
-
-volumes:
-- name: www
-  host:
-    path: /var/www/blog
