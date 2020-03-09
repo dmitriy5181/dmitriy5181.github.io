@@ -14,9 +14,10 @@ steps:
       user: pi
       key:
         from_secret: ssh_key
-      overwrite: true
+      rm: true
+      strip_components: 1
       source: "public/*"
-      target: /var/www/blog
+      target: /var/www/blog/public
 
   - name: notify
     image: drillster/drone-email
