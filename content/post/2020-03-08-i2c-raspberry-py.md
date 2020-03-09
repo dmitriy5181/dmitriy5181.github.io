@@ -53,6 +53,12 @@ To compile it:
 $ g++ ledclock.cpp -li2c -o ledclock
 ```
 
+Simple way to run it in background:
+
+```
+$ dtach -n /tmp/ledclock ./ledclock
+```
+
 Source code:
 
 {{< gist dmitriy5181 a349a9d803dbc34bd254d8215774828f >}}
