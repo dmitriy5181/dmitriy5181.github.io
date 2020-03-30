@@ -11,6 +11,12 @@ by copying data from the one volume to the other (assuming *source* and *destina
 $ docker run --rm -it -v <source>:/from -v <destination>:/to alpine ash -c "cd /from ; cp -av . /to"
 ```
 
+Also through the SSH:
+
+```
+$ ssh <host> 'docker run --rm -v <source>:/from alpine ash -c "tar cf - -C /from ."' | docker run --rm -i -v <destination>:/to alpine ash -c "tar xpf - -C /to"
+```
+
 Late *source* can be removed.
 
 **Host user in Docker container**
