@@ -40,4 +40,4 @@ More information about APT data sources, including recognized URI types can be f
  * Guide for Debian Maintainers, https://www.debian.org/doc/manuals/debmake-doc/index.en.html
  * Debian New Maintainers' Guide, https://www.debian.org/doc/manuals/maint-guide/index.en.html
  * Debian Policy Manual, technical requirements that each package must satisfy, https://www.debian.org/doc/debian-policy/
-​
+   * Maintainer script flowcharts, https://www.debian.org/doc/debian-policy/ap-flowcharts.html
