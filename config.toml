@@ -1,6 +1,6 @@
 baseURL = "https://blog.prgm.xyz"
 title = "// pragmatic engineering"
-theme = "hugo-journal"
+theme = "contrast-hugo"
 
 # see https://gohugo.io/getting-started/configuration/#configure-front-matter
 [frontmatter]
