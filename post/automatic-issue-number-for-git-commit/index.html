@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"><title>Hook to automatically add issue number during &#39;git commit&#39; | // pragmatic engineering</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.79.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/index.css">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/classes.css">
+<link rel="canonical" href="https://blog.prgm.xyz/post/automatic-issue-number-for-git-commit/">
+<link rel="alternate" type="application/rss+xml" href="" title="// pragmatic engineering">
+
+<body>
+
+<header class="icons">
+  
+    <a href="https://blog.prgm.xyz">// pragmatic engineering</a>
+  
+  
+  
+</header>
+
+<article>
+  <header>
+    <h1>Hook to automatically add issue number during &#39;git commit&#39;</h1>
+    <time datetime="2019-07-16T00:00:00Z">July 16, 2019</time>
+  </header>
+  <p>Save as <code>.git/hooks/commit-msg</code>:</p>
+<pre><code>#!/bin/bash
+
+COMMIT_MSG_FILE=&quot;$1&quot;
+BRANCH_NAME=$(git symbolic-ref --short HEAD)
+
+# check if branch name is following to the &quot;issue-123-xxxx&quot; format
+if [[ ${BRANCH_NAME%%-*} != &quot;issue&quot; ]]
+then
+    exit 0
+fi
+
+ISSUE_STRING=${BRANCH_NAME#issue-}
+ISSUE_STRING=${ISSUE_STRING%%-*}
+ISSUE_STRING=&quot;Issue: #$ISSUE_STRING&quot;
+
+# add issue number only if not already added
+if [[ $(grep -c &quot;$ISSUE_STRING&quot; $COMMIT_MSG_FILE) -eq 0 ]]
+then
+    # add issue number depends on how 'git commit' was called:
+    #   - 'git commit' =&gt; before the first line started with the '#'
+    #   - 'git commit -m &quot;xxx&quot;' =&gt; after the last line
+    gawk -i inplace -v &quot;var=$ISSUE_STRING&quot; \
+        '/^#.*/ &amp;&amp; !x {printf(&quot;\n&quot;); print var; x=1} ENDFILE {if (!x) {printf(&quot;\n&quot;); print var}} 1' \
+        $COMMIT_MSG_FILE
+fi
+</code></pre>
+</article>
+
+
+
+</body>
+
+</html>

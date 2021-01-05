@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en"><title>Setup OpenVPN on Debian &#39;buster&#39; | // pragmatic engineering</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.79.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/index.css">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/classes.css">
+<link rel="canonical" href="https://blog.prgm.xyz/post/openvpn-on-debian-buster/">
+<link rel="alternate" type="application/rss+xml" href="" title="// pragmatic engineering">
+
+<body>
+
+<header class="icons">
+  
+    <a href="https://blog.prgm.xyz">// pragmatic engineering</a>
+  
+  
+  
+</header>
+
+<article>
+  <header>
+    <h1>Setup OpenVPN on Debian &#39;buster&#39;</h1>
+    <time datetime="2019-07-11T00:00:00Z">July 11, 2019</time>
+  </header>
+  <p><strong>Prerequisites</strong></p>
+<p>First, install needed package:</p>
+<pre><code># apt install openvpn
+</code></pre>
+<p><strong>Easy-RSA</strong></p>
+<p>Create certificates directory:</p>
+<pre><code>$ make-cadir myca
+</code></pre>
+<p>From inside that directory initiate the public key infrastructure (PKI):</p>
+<pre><code>$ ./easyrsa init-pki
+</code></pre>
+<p>Create new certificate authority (CA):</p>
+<pre><code>$ ./easyrsa build-ca nopass
+</code></pre>
+<p>Generate a keypair and certificate request for the <strong>server</strong>:</p>
+<pre><code>$ ./easyrsa gen-req &lt;server-name&gt; nopass
+</code></pre>
+<p>Then sign the request:</p>
+<pre><code>$ ./easyrsa sign-req server &lt;server-name&gt;
+</code></pre>
+<p>Generate a keypair and certificate request for the <strong>client</strong>:</p>
+<pre><code>$ ./easyrsa gen-req &lt;client-name&gt; nopass
+</code></pre>
+<p>Then sign the request:</p>
+<pre><code>$ ./easyrsa sign-req client &lt;client-name&gt;
+</code></pre>
+<p><strong>OpenVPN</strong></p>
+<p>The <code>/usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz</code> and <code>/usr/share/doc/openvpn/examples/sample-config-files/client.conf</code> can be used as starting point to create server and client configuration files respectively. Parameters are mostly self-explanatory.</p>
+<p>Generate an HMAC signature:</p>
+<pre><code>$ openvpn --genkey --secret ta.key
+</code></pre>
+<p>Create a strong Diffie-Hellman key:</p>
+<pre><code>$ openssl dhparam -out dh2048.pem 2048
+</code></pre>
+<p><strong>Server</strong></p>
+<p>Uncomment next line in the <code>/etc/sysctl.conf</code>:</p>
+<pre><code>net.ipv4.ip_forward=1
+</code></pre>
+<p>and apply changes:</p>
+<pre><code># sysctl -p
+</code></pre>
+<p>Put <code>ca.crt</code>, <code>dh2048.pem</code>, <code>ta.key</code> and <code>&lt;server-name&gt;.{conf,crt,key}</code> files into the directory <code>/etc/openvpn/server</code>.</p>
+<p>Start service:</p>
+<pre><code># systemctl start openvpn-server@&lt;server-name&gt;
+</code></pre>
+<p><strong>Client</strong></p>
+<p>Put <code>ca.crt</code>, <code>ta.key</code> and <code>&lt;client-name&gt;.{conf,crt,key}</code> files into the directory <code>/etc/openvpn/client</code>.</p>
+<p>Start service:</p>
+<pre><code># systemctl start openvpn-client@&lt;client-name&gt;
+</code></pre>
+<p>Mobile clients are usually using <em>.ovpn</em>-file. OpenVPN allows including files in the main configuration
+for some option. And <em>.ovpn</em>-file is just a regular configuration file with all other files included inline.
+More information can be found in <code>openvpn(8)</code> man page (search for <em>INLINE FILE SUPPORT</em>).</p>
+<p>Example of an inline file usage:</p>
+<pre><code>&lt;cert&gt;
+-----BEGIN CERTIFICATE-----
+[...]
+-----END CERTIFICATE-----
+&lt;/cert&gt;
+</code></pre><p><strong>Routing all client traffic through the VPN</strong></p>
+<p>To implement this the directive <code>redirect-gateway def1</code> should be set for client. It can be done either for only specific client(s) via client&rsquo;s configuration or for all clients at once via server&rsquo;s configuration. By using this directive the server need to be configured to deal with client traffic. To NAT the VPN client traffic to the Internet:</p>
+<pre><code># iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
+</code></pre>
+<p>Command assumes that the VPN subnet is <em>10.8.0.0/24</em> (taken from the server directive in the OpenVPN server configuration) and that the local ethernet interface is <em>eth0</em>. To persist this settings the <em>iptables-persistent</em> package can be used.</p>
+<p><strong>Links</strong></p>
+<ul>
+<li><a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-an-openvpn-server-on-debian-9">https://www.digitalocean.com/community/tutorials/how-to-set-up-an-openvpn-server-on-debian-9</a></li>
+<li><a href="https://openvpn.net/community-resources/how-to">https://openvpn.net/community-resources/how-to</a></li>
+</ul>
+
+</article>
+
+
+
+</body>
+
+</html>

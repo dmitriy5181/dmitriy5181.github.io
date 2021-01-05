@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en"><title>Expand the scope of the VPN | // pragmatic engineering</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.79.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/index.css">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/classes.css">
+<link rel="canonical" href="https://blog.prgm.xyz/post/expand-openvpn-scope/">
+<link rel="alternate" type="application/rss+xml" href="" title="// pragmatic engineering">
+
+<body>
+
+<header class="icons">
+  
+    <a href="https://blog.prgm.xyz">// pragmatic engineering</a>
+  
+  
+  
+</header>
+
+<article>
+  <header>
+    <h1>Expand the scope of the VPN</h1>
+    <time datetime="2020-12-22T00:00:00Z">December 22, 2020</time>
+  </header>
+  <p>Suppose a client machine connects to the VPN and at the same time to the local LAN.
+In this case such client can act as a gateway for the LAN and VPN clients will be able to reach LAN machines
+through it. Next image illustrates the situation.</p>
+<p><img src="/lan-gateway.png" alt=""></p>
+<p>To achieve connectivity between VPN and LAN clients following adjustments are needed.</p>
+<p><strong>OpenVPN server</strong></p>
+<p>Tell the OpenVPN server that the 192.168.178.0/24 subnet should be routed to a LAN gateway.
+For this the LAN gateway configuration should contain (can be set through the <em>ccd</em> directory):</p>
+<pre><code>iroute 192.168.178.0 255.255.255.0
+</code></pre>
+<p>Then set in the main server configuration file:</p>
+<pre><code>route 192.168.178.0 255.255.255.0
+</code></pre>
+<p>Also, to allow network traffic between LAN and VPN clients ask OpenVPN server to advertise LAN subnet
+to VPN clients by adding to the server configuration:</p>
+<pre><code>client-to-client
+push &quot;route 192.168.178.0 255.255.255.0&quot;
+</code></pre>
+<p><strong>LAN gateway</strong></p>
+<p>Enable IP forwarding (to make it persistent add <em>&ldquo;net.ipv4.ip_forward=1&rdquo;</em> to the <em>/etc/sysctl.conf</em>):</p>
+<pre><code># sysctl -w net.ipv4.ip_forward=1
+</code></pre>
+<p>Set the iptables rule (<em>iptables-persistent</em> package can be used to make it persistent):</p>
+<pre><code># iptables -t nat -A POSTROUTING -j MASQUERADE
+</code></pre>
+<p><strong>References</strong></p>
+<ul>
+<li><a href="https://openvpn.net/community-resources/how-to/#scope">https://openvpn.net/community-resources/how-to/#scope</a></li>
+</ul>
+
+</article>
+
+
+
+</body>
+
+</html>

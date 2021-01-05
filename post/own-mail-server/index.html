@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en"><title>Setup own outgoing mail server | // pragmatic engineering</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.79.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/index.css">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/classes.css">
+<link rel="canonical" href="https://blog.prgm.xyz/post/own-mail-server/">
+<link rel="alternate" type="application/rss+xml" href="" title="// pragmatic engineering">
+
+<body>
+
+<header class="icons">
+  
+    <a href="https://blog.prgm.xyz">// pragmatic engineering</a>
+  
+  
+  
+</header>
+
+<article>
+  <header>
+    <h1>Setup own outgoing mail server</h1>
+    <time datetime="2019-08-27T00:00:00Z">August 27, 2019</time>
+  </header>
+  <p>Ability to have own outgoing mail server might be handy in some situation. For example to send automated notifications. And Postfix as a mail server is a popular option.</p>
+<p>Although default Postfix configuration will work in general case, <em>Gmail</em> and most likely other free mail services will not pass through such mail. For reliable mail delivery just only pure Postfix is not enough. Few other component should be in place also. Those components will be described first.</p>
+<p>Next steps were done on Debian 10 <em>&ldquo;buster&rdquo;</em> assuming <code>example.com</code> as a server&rsquo;s domain name.</p>
+<p><strong>SASL authentication</strong></p>
+<p>Install needed packages:</p>
+<pre><code># apt install libsasl2-2 sasl2-bin
+</code></pre><p>There are multiple possibilities to configure SASL authentication and this guide describes usage of SASL Authentication Daemon in combination with <em>sasldb</em>. Create an entry for the user and set password:</p>
+<pre><code># saslpasswd2 -c -u example.com username
+</code></pre><p>Create a file <code>/etc/postfix/sasl/smtpd.conf</code>:</p>
+<pre><code>pwcheck_method: saslauthd
+mech_list: PLAIN LOGIN
+</code></pre><p>Adjust <code>/etc/default/saslauthd</code> to contain following:</p>
+<pre><code>START=yes
+MECHANISMS=&quot;sasldb&quot;
+OPTIONS=&quot;-c -m /var/spool/postfix/var/run/saslauthd&quot;
+</code></pre><p>Create required subdirectories in Postfix chroot:</p>
+<pre><code># dpkg-statoverride --add root sasl 710 /var/spool/postfix/var/run/saslauthd
+</code></pre><p>Restart SASL Authentication Daemon:</p>
+<pre><code># systemctl restart saslauthd
+</code></pre><p>Add Postfix to the <em>&ldquo;sasl&rdquo;</em> group so that it can communicate with SASL Authentication Daemon:</p>
+<pre><code># adduser postfix sasl
+</code></pre><p><strong>Sender Policy Framework (SPF)</strong></p>
+<p>Add a TXT record for a domain <code>example.com</code> with the next content:</p>
+<pre><code>v=spf1 a ~all
+</code></pre><p><strong>DomainKeys Identified Mail (DKIM)</strong></p>
+<p>Install needed packages:</p>
+<pre><code># apt install opendkim opendkim-tools
+</code></pre><p>Generate the pair of public/private keys:</p>
+<pre><code># opendkim-genkey -D /etc/dkimkeys/ -d example.com -s default
+</code></pre><p>Create directory to hold a unix socket for OpenDKIM under the Postfix chroot location:</p>
+<pre><code># dpkg-statoverride --add opendkim opendkim 710 /var/spool/postfix/var/run/opendkim
+</code></pre><p>Adjust OpenDKIM configuration in <code>/etc/opendkim.conf</code>:</p>
+<pre><code>Domain          example.com
+KeyFile         /etc/dkimkeys/default.private
+Selector        default
+
+Socket          local:/var/spool/postfix/var/run/opendkim/opendkim.sock
+</code></pre><p>Restart OpenDKIM and make sure it works:</p>
+<pre><code># systemctl restart opendkim
+</code></pre><p>Add a TXT record for a subdomain <code>default._domainkey.example.com</code> with the content taken from the <code>/etc/dkimkeys/default.txt</code>:</p>
+<pre><code>v=DKIM1; h=sha256; k=rsa; p=MIIB...
+</code></pre><p>Add Postfix to the <em>&ldquo;opendkim&rdquo;</em> group so that it can communicate with OpenDKIM:</p>
+<pre><code># adduser postfix opendkim
+</code></pre><p><strong>Domain-based Message Authentication, Reporting and Conformance (DMARC)</strong></p>
+<p>After SPF and DKIM are configured, add a TXT record for a subdomain <code>_dmarc.example.com</code> with the next content:</p>
+<pre><code>v=DMARC1; p=none
+</code></pre><p><strong>Reverse DNS lookup</strong></p>
+<p>rDNS is relaying on a PTR record and to set it up for a DigitalOcean droplet set droplet&rsquo;s name same to the domain name (<em>example.com</em>).</p>
+<p><strong>TLS certificates</strong></p>
+<p>It is better to use proper certificates instead of self-signed which are provided by the <em>ssl-cert</em> package. It can be easily done with the help of Let&rsquo;s Encrypt and <code>certbot</code>.</p>
+<p><strong>Postfix</strong></p>
+<p>Install needed packages:</p>
+<pre><code># apt install mailutils postfix
+</code></pre><p>Since Postfix will be used as a message submission agent (MSA) only a mail transfer agent (MTA) service can be turned off. As a result incoming mail will be disabled. To achieve this open Postfix master process configuration file <em>/etc/postfix/master.cf</em>, comment out line for the &ldquo;smtp&rdquo; service and uncomment the &ldquo;submission&rdquo; service:</p>
+<pre><code>#smtp      inet  n       -       y       -       -       smtpd
+submission inet n       -       y       -       -       smtpd
+  -o syslog_name=postfix/submission
+  -o smtpd_tls_security_level=encrypt
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_tls_auth_only=yes
+</code></pre><p>With this configuration the MTA-functionality on port 25 will be disabled and the MSA on port 587 enabled.</p>
+<p>Next, adjust Postfix configuration parameters in <em>/etc/postfix/main.cf</em>:</p>
+<pre><code># Important for rDNS
+mydomain = example.com
+myhostname = example.com
+
+# OpenDKIM
+milter_default_action = accept
+milter_protocol = 6
+smtpd_milters = unix:/var/run/opendkim/opendkim.sock
+non_smtpd_milters = unix:/var/run/opendkim/opendkim.sock
+
+# TLS certificates
+smtpd_tls_cert_file=/etc/letsencrypt/live/example.com/fullchain.pem
+smtpd_tls_key_file=/etc/letsencrypt/live/example.com/privkey.pem
+
+# Good to have
+smtp_tls_security_level = may
+</code></pre><p>Restart Postfix after updating its configuration:</p>
+<pre><code># systemctl restart postfix
+</code></pre><p><strong>Test tools</strong></p>
+<p>Locally, a test mail can be send as:</p>
+<pre><code>echo &quot;This is the body of the email&quot; | mail -s &quot;This is the subject line&quot; your@email.address
+</code></pre><p>Remotely, Swaks (Swiss Army Knife SMTP) can be used for the testing, for example:</p>
+<pre><code>$ swaks --to example@gmail.com --from test@example.com&gt;&quot; --server example.com --auth-user username@example.com --auth-password pa$$word --tls &quot;Some message&quot;
+
+</code></pre><p><strong>References</strong></p>
+<ul>
+<li><a href="https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-postfix-as-a-send-only-smtp-server-on-debian-10">How To Install and Configure Postfix as a Send-Only SMTP Server on Debian 10</a></li>
+<li><a href="https://scaron.info/blog/debian-mail-postfix-dovecot.html">Debian 9 Mail Server, Part I: Postfix and Dovecot</a></li>
+<li><a href="https://scaron.info/blog/debian-mail-spf-dkim.html">Debian 9 Mail Server, Part II: SPF and DKIM</a></li>
+<li><a href="https://wiki.debian.org/opendkim">https://wiki.debian.org/opendkim</a></li>
+<li><a href="https://wiki.debian.org/PostfixAndSASL">https://wiki.debian.org/PostfixAndSASL</a></li>
+<li><a href="http://www.postfix.org/SASL_README.html">http://www.postfix.org/SASL_README.html</a></li>
+<li><a href="http://www.postfix.org/postconf.5.html">http://www.postfix.org/postconf.5.html</a></li>
+</ul>
+
+</article>
+
+
+
+</body>
+
+</html>

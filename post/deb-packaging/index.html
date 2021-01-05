@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"><title>The simplest possible Debian packaging | // pragmatic engineering</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.79.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/index.css">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/classes.css">
+<link rel="canonical" href="https://blog.prgm.xyz/post/deb-packaging/">
+<link rel="alternate" type="application/rss+xml" href="" title="// pragmatic engineering">
+
+<body>
+
+<header class="icons">
+  
+    <a href="https://blog.prgm.xyz">// pragmatic engineering</a>
+  
+  
+  
+</header>
+
+<article>
+  <header>
+    <h1>The simplest possible Debian packaging</h1>
+    <time datetime="2019-07-09T00:00:00Z">July 09, 2019</time>
+  </header>
+  <p><strong>Package</strong></p>
+<p>Basic skeleton for the Debian-package can be build with the help of <code>debmake</code>. As a result the <em>debian</em> directory with the minimal set of required files will be created:</p>
+<pre><code>$ DEBEMAIL=test@example.com DEBFULLNAME=Test debmake --native --package test --upstreamversion 1.0.0 --revision 1
+$ find debian -type f -not -name control -not -name copyright -not -name changelog -not -name rules -not -name compat -not -name format -delete
+</code></pre>
+<p>To build binary package (<code>-b</code>) without signing the <em>.changes</em> file (<code>-uc</code>):</p>
+<pre><code>$ dpkg-buildpackage -uc -b
+</code></pre>
+<p>Created <em>deb-package</em> will be in one directory up.</p>
+<p><strong>Repository</strong></p>
+<p>Managing the Debian packages repository can be done with the <code>reprepro</code>. Assuming repository will be located under the directory <em>/srv/packages</em>, create simple text file in it: <em>/srv/packages/conf/distributions</em>. With the content:</p>
+<pre><code>Codename: stretch
+Architectures: amd64
+Components: main
+</code></pre><p>After this, a binary package can be added into the repository with the next command:</p>
+<pre><code># reprepro --basedir /srv/packages includedeb stretch /path/to/package_1.0.0_all.deb
+</code></pre>
+<p>To be able to use this repository locally, create file <em>/etc/apt/sources.list.d/local.list</em> with the next content:</p>
+<pre><code>deb [trusted=yes] file:///srv/packages stretch main
+</code></pre>
+<p>More information about APT data sources, including recognized URI types can be found in <code>sources.list(5)</code>.</p>
+<p><strong>Useful links</strong></p>
+<ul>
+<li>Guide for Debian Maintainers, <a href="https://www.debian.org/doc/manuals/debmake-doc/index.en.html">https://www.debian.org/doc/manuals/debmake-doc/index.en.html</a></li>
+<li>Debian New Maintainers' Guide, <a href="https://www.debian.org/doc/manuals/maint-guide/index.en.html">https://www.debian.org/doc/manuals/maint-guide/index.en.html</a></li>
+<li>Debian Policy Manual, technical requirements that each package must satisfy, <a href="https://www.debian.org/doc/debian-policy/">https://www.debian.org/doc/debian-policy/</a>
+<ul>
+<li>Maintainer script flowcharts, <a href="https://www.debian.org/doc/debian-policy/ap-flowcharts.html">https://www.debian.org/doc/debian-policy/ap-flowcharts.html</a></li>
+</ul>
+</li>
+</ul>
+
+</article>
+
+
+
+</body>
+
+</html>

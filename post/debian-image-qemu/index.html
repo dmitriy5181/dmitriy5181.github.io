@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en"><title>Debian image for QEMU | // pragmatic engineering</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.79.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/index.css">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/classes.css">
+<link rel="canonical" href="https://blog.prgm.xyz/post/debian-image-qemu/">
+<link rel="alternate" type="application/rss+xml" href="" title="// pragmatic engineering">
+
+<body>
+
+<header class="icons">
+  
+    <a href="https://blog.prgm.xyz">// pragmatic engineering</a>
+  
+  
+  
+</header>
+
+<article>
+  <header>
+    <h1>Debian image for QEMU</h1>
+    <time datetime="2019-04-03T00:00:00Z">April 03, 2019</time>
+  </header>
+  <p>How to create and run Debian image with QEMU. Might be useful for testing.</p>
+<p>Create the hard disk image of &lsquo;qcow2&rsquo; format (<code>-f</code> option) with specified <em>filename</em> and 4 gigabytes size:</p>
+<pre><code>$ qemu-img create -f qcow2 debian-base.qcow 4G
+</code></pre>
+<p>Download installation <em>.iso</em> from the <a href="https://www.debian.org/distrib/">https://www.debian.org/distrib/</a>. Boot the image with previously created image as hard disk 0 (<code>-hda</code> option), 512 megabytes of RAM (<code>-m</code> option), downloaded <em>.iso</em> as CD-ROM (<code>-cdrom</code> option) and with the first CD-ROM as boot drive (<code>-b</code> option):</p>
+<pre><code>$ qemu-system-x86_64 -hda debian-base.qcow -m 512 -cdrom debian-9.8.0-amd64-netinst.iso -boot d
+</code></pre>
+<p>After the installation is done, the system can be booted with (append next options to enable ssh forwarding: <em>-net nic -net user,hostfwd=tcp::2222-:22</em>):</p>
+<pre><code>$ qemu-system-x86_64 -hda debian-base.qcow -m 512
+</code></pre>
+<p>Taking a snapshot of &lsquo;qcow2&rsquo; format (<code>-f</code> option) using specified file as <em>base image</em> (<code>-b</code> option):</p>
+<pre><code>$ qemu-img create -f qcow2 -b debian-base.qcow debian-base-snapshot-01.qcow
+</code></pre>
+<p>Run from the snapshot:</p>
+<pre><code>$ qemu-system-x86_64 -hda debian-base-snapshot-01.qcow -m 512
+</code></pre>
+<p>​
+To avoid changing the hard drive image during run add <code>-snapshot</code> option and changes will be written to temporary files leaving disk image unaffected.</p>
+<p>Useful links:</p>
+<ul>
+<li><a href="https://wiki.debian.org/QEMU">https://wiki.debian.org/QEMU</a></li>
+<li><a href="https://dustymabe.com/2015/01/11/qemu-img-backing-files-a-poor-mans-snapshotrollback/">https://dustymabe.com/2015/01/11/qemu-img-backing-files-a-poor-mans-snapshotrollback/</a></li>
+</ul>
+
+</article>
+
+
+
+</body>
+
+</html>

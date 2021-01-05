@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"><title>How to setup reliable ssh tunnel | // pragmatic engineering</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.79.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/index.css">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/classes.css">
+<link rel="canonical" href="https://blog.prgm.xyz/post/reliable-ssh-tunnel/">
+<link rel="alternate" type="application/rss+xml" href="" title="// pragmatic engineering">
+
+<body>
+
+<header class="icons">
+  
+    <a href="https://blog.prgm.xyz">// pragmatic engineering</a>
+  
+  
+  
+</header>
+
+<article>
+  <header>
+    <h1>How to setup reliable ssh tunnel</h1>
+    <time datetime="2019-01-09T00:00:00Z">January 09, 2019</time>
+  </header>
+  <p>Used tools are autossh and systemd user unit. Might be useful for Raspberry Pi in combination with <a href="http://serveo.net">http://serveo.net</a></p>
+<p>Install autossh:</p>
+<pre><code>% sudo apt install autossh
+</code></pre><p>Create ssh tunnel configuration in the <code>~/.ssh/config</code>:</p>
+<pre><code>Host example
+    HostName example.net
+    RemoteForward 22 localhost:22
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+    ExitOnForwardFailure yes
+</code></pre><p>Before going any further, run next command to authenticate host and update <code>~/.ssh/known_hosts</code>:</p>
+<pre><code>% ssh example
+</code></pre><p>Create systemd template unit file <code>~/.config/systemd/user/autossh-tunnel@.service</code>:</p>
+<pre><code>[Unit]
+Description=AutoSSH to '%I'
+After=network.target
+
+[Service]
+Environment=&quot;AUTOSSH_GATETIME=0&quot;
+ExecStart=/usr/bin/autossh -M 0 -N %I
+ExecStop=/bin/kill $MAINPID
+
+[Install]
+WantedBy=default.target
+</code></pre><p>Reload configuration and start service:</p>
+<pre><code>% systemctl --user daemon-reload
+% systemctl --user start autossh-tunnel@example
+</code></pre><p>Enable autostart for the service:</p>
+<pre><code>% systemctl --user enable autossh-tunnel@example
+</code></pre><p>Allow (optionally) to run services without session been opened:</p>
+<pre><code>% sudo loginctl enable-linger username
+</code></pre>
+</article>
+
+
+
+</body>
+
+</html>

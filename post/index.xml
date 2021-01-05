@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on // pragmatic engineering</title>
+    <link>https://blog.prgm.xyz/post/</link>
+    <description>Recent content in Posts on // pragmatic engineering</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Tue, 22 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://blog.prgm.xyz/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Expand the scope of the VPN</title>
+      <link>https://blog.prgm.xyz/post/expand-openvpn-scope/</link>
+      <pubDate>Tue, 22 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/expand-openvpn-scope/</guid>
+      <description>Suppose a client machine connects to the VPN and at the same time to the local LAN. In this case such client can act as a gateway for the LAN and VPN clients will be able to reach LAN machines through it. Next image illustrates the situation.
+To achieve connectivity between VPN and LAN clients following adjustments are needed.
+OpenVPN server
+Tell the OpenVPN server that the 192.168.178.0/24 subnet should be routed to a LAN gateway.</description>
+    </item>
+    
+    <item>
+      <title>Tracking external dependencies with git-subtree</title>
+      <link>https://blog.prgm.xyz/post/git-subtree/</link>
+      <pubDate>Sun, 20 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/git-subtree/</guid>
+      <description>git-subtree(1) provides a nice way to integrate external code and track it over time. For example to add the source code of Hugo under the sub-directory &amp;lsquo;hugo&amp;rsquo;:
+$ git subtree add -P hugo git@github.com:gohugoio/hugo.git v0.79.1 --squash --message=&amp;quot;import hugo v0.79.1&amp;quot;  The man-page of git-subtree provides an explanation of available commands.</description>
+    </item>
+    
+    <item>
+      <title>Setup and use SOCKS server</title>
+      <link>https://blog.prgm.xyz/post/socks-server/</link>
+      <pubDate>Sat, 14 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/socks-server/</guid>
+      <description>In some cases it might be useful to run own SOCKS server. Dante (see danted(8)) which implements server as well as client part might be a possible choice.
+Server
+Install package:
+$ sudo apt install dante-server Configuration file is installed at /etc/danted.conf, possible values are:
+logoutput: syslog internal: &amp;lt;interface&amp;gt; port = 1080 external: &amp;lt;interface&amp;gt; socksmethod: none clientmethod: none user.privileged: proxy user.unprivileged: nobody user.libwrap: nobody client pass { from: 0.0.0.0/0 to: 0.</description>
+    </item>
+    
+    <item>
+      <title>Setup and use VNC server</title>
+      <link>https://blog.prgm.xyz/post/vnc/</link>
+      <pubDate>Thu, 12 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/vnc/</guid>
+      <description>Article consists of two part: first part describes how to setup server and second is about client. In both cases TigerVNC will be used.
+VNC server
+Server is running on Linux (Ubuntu). First install required packages (JWM will be used as desktop environment):
+$ sudo apt install tigervnc-standalone-server jwm Then set password which client will use later to connect:
+$ vncpasswd On start TigerVNC will read configuration from the /etc/vnc.conf and then run script /etc/X11/Xvnc-session.</description>
+    </item>
+    
+    <item>
+      <title>Work with I2C on Raspberry Pi</title>
+      <link>https://blog.prgm.xyz/post/i2c-raspberry-py/</link>
+      <pubDate>Sun, 08 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/i2c-raspberry-py/</guid>
+      <description>Article is describing basic steps on how to start working with an I2C device. The end goal is a simple LED clock. Everything was done on the Raspbian &amp;ldquo;Buster&amp;rdquo; with using Adafruit 4-Digit 7-Segment Display.
+Essential links:
+ Implementing I2C device drivers in userspace - basics on how to work with I2C in Linux i2c-tools - user-space library and command line tools Adafruit 1.2&amp;quot; 4-Digit 7-Segment Display w/I2C Backpack - information about used LED display  First, enable I2C:</description>
+    </item>
+    
+    <item>
+      <title>Setup own outgoing mail server</title>
+      <link>https://blog.prgm.xyz/post/own-mail-server/</link>
+      <pubDate>Tue, 27 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/own-mail-server/</guid>
+      <description>Ability to have own outgoing mail server might be handy in some situation. For example to send automated notifications. And Postfix as a mail server is a popular option.
+Although default Postfix configuration will work in general case, Gmail and most likely other free mail services will not pass through such mail. For reliable mail delivery just only pure Postfix is not enough. Few other component should be in place also.</description>
+    </item>
+    
+    <item>
+      <title>Hook to automatically add issue number during &#39;git commit&#39;</title>
+      <link>https://blog.prgm.xyz/post/automatic-issue-number-for-git-commit/</link>
+      <pubDate>Tue, 16 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/automatic-issue-number-for-git-commit/</guid>
+      <description>Save as .git/hooks/commit-msg:
+#!/bin/bash COMMIT_MSG_FILE=&amp;quot;$1&amp;quot; BRANCH_NAME=$(git symbolic-ref --short HEAD) # check if branch name is following to the &amp;quot;issue-123-xxxx&amp;quot; format if [[ ${BRANCH_NAME%%-*} != &amp;quot;issue&amp;quot; ]] then exit 0 fi ISSUE_STRING=${BRANCH_NAME#issue-} ISSUE_STRING=${ISSUE_STRING%%-*} ISSUE_STRING=&amp;quot;Issue: #$ISSUE_STRING&amp;quot; # add issue number only if not already added if [[ $(grep -c &amp;quot;$ISSUE_STRING&amp;quot; $COMMIT_MSG_FILE) -eq 0 ]] then # add issue number depends on how &#39;git commit&#39; was called: # - &#39;git commit&#39; =&amp;gt; before the first line started with the &#39;#&#39; # - &#39;git commit -m &amp;quot;xxx&amp;quot;&#39; =&amp;gt; after the last line gawk -i inplace -v &amp;quot;var=$ISSUE_STRING&amp;quot; \ &#39;/^#.</description>
+    </item>
+    
+    <item>
+      <title>Automatic swap file management</title>
+      <link>https://blog.prgm.xyz/post/automatic-swap/</link>
+      <pubDate>Mon, 15 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/automatic-swap/</guid>
+      <description>Just install dphys-swapfile and it will do the rest:
+# apt install dphys-swapfile By default, it creates swapfile twice as big as the present RAM amount. Settings can be customized by editing the config file /etc/dphys-swapfile. For more details see dphys-swapfile(8).</description>
+    </item>
+    
+    <item>
+      <title>Docker hacks</title>
+      <link>https://blog.prgm.xyz/post/docker-hacks/</link>
+      <pubDate>Sun, 14 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/docker-hacks/</guid>
+      <description>Rename docker volume
+Unfortunately Docker does not directly support volume rename operation. But same result can be achieved by copying data from the one volume to the other (assuming source and destination already exist):
+$ docker run --rm -it -v &amp;lt;source&amp;gt;:/from -v &amp;lt;destination&amp;gt;:/to alpine ash -c &amp;quot;cd /from ; cp -av . /to&amp;quot; Also through the SSH:
+$ ssh &amp;lt;host&amp;gt; &#39;docker run --rm -v &amp;lt;source&amp;gt;:/from alpine ash -c &amp;quot;tar cf - -C /from .</description>
+    </item>
+    
+    <item>
+      <title>Secure Drone CI with HTTPS-enabled Nginx as reverse proxy</title>
+      <link>https://blog.prgm.xyz/post/drone-nginx-https/</link>
+      <pubDate>Fri, 12 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/drone-nginx-https/</guid>
+      <description>Prerequisites
+Nginx and Certbot supposed to be installed. If not:
+# apt install nginx python-certbot-nginx  Configure and enable Nginx &amp;ldquo;server block&amp;rdquo; (analog of &amp;ldquo;virtual host&amp;rdquo; in Apache):
+# vim /etc/nginx/sites-available/example.com ... # ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/  To check Nginx configuration before enabling it, run:
+# nginx -t  Obtain SSL certificate and reconfigure Nginx
+Just run next command and follow on-screen instruction:
+# certbot --nginx -d example.com  After completing, open example.</description>
+    </item>
+    
+    <item>
+      <title>Setup OpenVPN on Debian &#39;buster&#39;</title>
+      <link>https://blog.prgm.xyz/post/openvpn-on-debian-buster/</link>
+      <pubDate>Thu, 11 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/openvpn-on-debian-buster/</guid>
+      <description>Prerequisites
+First, install needed package:
+# apt install openvpn  Easy-RSA
+Create certificates directory:
+$ make-cadir myca  From inside that directory initiate the public key infrastructure (PKI):
+$ ./easyrsa init-pki  Create new certificate authority (CA):
+$ ./easyrsa build-ca nopass  Generate a keypair and certificate request for the server:
+$ ./easyrsa gen-req &amp;lt;server-name&amp;gt; nopass  Then sign the request:
+$ ./easyrsa sign-req server &amp;lt;server-name&amp;gt;  Generate a keypair and certificate request for the client:</description>
+    </item>
+    
+    <item>
+      <title>The simplest possible Debian packaging</title>
+      <link>https://blog.prgm.xyz/post/deb-packaging/</link>
+      <pubDate>Tue, 09 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/deb-packaging/</guid>
+      <description>Package
+Basic skeleton for the Debian-package can be build with the help of debmake. As a result the debian directory with the minimal set of required files will be created:
+$ DEBEMAIL=test@example.com DEBFULLNAME=Test debmake --native --package test --upstreamversion 1.0.0 --revision 1 $ find debian -type f -not -name control -not -name copyright -not -name changelog -not -name rules -not -name compat -not -name format -delete  To build binary package (-b) without signing the .</description>
+    </item>
+    
+    <item>
+      <title>Debian image for QEMU</title>
+      <link>https://blog.prgm.xyz/post/debian-image-qemu/</link>
+      <pubDate>Wed, 03 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/debian-image-qemu/</guid>
+      <description>How to create and run Debian image with QEMU. Might be useful for testing.
+Create the hard disk image of &amp;lsquo;qcow2&amp;rsquo; format (-f option) with specified filename and 4 gigabytes size:
+$ qemu-img create -f qcow2 debian-base.qcow 4G  Download installation .iso from the https://www.debian.org/distrib/. Boot the image with previously created image as hard disk 0 (-hda option), 512 megabytes of RAM (-m option), downloaded .iso as CD-ROM (-cdrom option) and with the first CD-ROM as boot drive (-b option):</description>
+    </item>
+    
+    <item>
+      <title>Update upstream version for a Debian package</title>
+      <link>https://blog.prgm.xyz/post/update-debian-package/</link>
+      <pubDate>Wed, 27 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/update-debian-package/</guid>
+      <description>Article describes how to use more recent upstream version of Unison on Debian &amp;ldquo;stable&amp;rdquo;.
+First, create directory for the workspace and change to it. Now obtain source package for the current version:
+$ apt-get --download-only source unison  To be able to do this, make sure that Apt sources list includes deb-src archive type. See /etc/apt/sources.list.
+Workspace should contain next files now (X.Y.Z is the version number):
+unison_X.Y.Z-1.dsc unison_X.Y.Z.orig.tar.gz unison_X.Y.Z-1.debian.tar.xz  Download archive with the latest upstream version and rename it to follow same pattern (unison_X.</description>
+    </item>
+    
+    <item>
+      <title>How to setup reliable ssh tunnel</title>
+      <link>https://blog.prgm.xyz/post/reliable-ssh-tunnel/</link>
+      <pubDate>Wed, 09 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://blog.prgm.xyz/post/reliable-ssh-tunnel/</guid>
+      <description>Used tools are autossh and systemd user unit. Might be useful for Raspberry Pi in combination with http://serveo.net
+Install autossh:
+% sudo apt install autossh Create ssh tunnel configuration in the ~/.ssh/config:
+Host example HostName example.net RemoteForward 22 localhost:22 ServerAliveInterval 30 ServerAliveCountMax 3 ExitOnForwardFailure yes Before going any further, run next command to authenticate host and update ~/.ssh/known_hosts:
+% ssh example Create systemd template unit file ~/.config/systemd/user/autossh-tunnel@.service:
+[Unit] Description=AutoSSH to &#39;%I&#39; After=network.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://blog.prgm.xyz/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/expand-openvpn-scope/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/git-subtree/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/socks-server/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/vnc/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/i2c-raspberry-py/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/own-mail-server/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/automatic-issue-number-for-git-commit/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/automatic-swap/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/docker-hacks/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/drone-nginx-https/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/openvpn-on-debian-buster/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/deb-packaging/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/debian-image-qemu/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/update-debian-package/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/post/reliable-ssh-tunnel/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/categories/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.prgm.xyz/tags/</loc>
+  </url>
+  
+</urlset>

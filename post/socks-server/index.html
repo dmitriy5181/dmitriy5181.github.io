@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"><title>Setup and use SOCKS server | // pragmatic engineering</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.79.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/index.css">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/classes.css">
+<link rel="canonical" href="https://blog.prgm.xyz/post/socks-server/">
+<link rel="alternate" type="application/rss+xml" href="" title="// pragmatic engineering">
+
+<body>
+
+<header class="icons">
+  
+    <a href="https://blog.prgm.xyz">// pragmatic engineering</a>
+  
+  
+  
+</header>
+
+<article>
+  <header>
+    <h1>Setup and use SOCKS server</h1>
+    <time datetime="2020-03-14T00:00:00Z">March 14, 2020</time>
+  </header>
+  <p>In some cases it might be useful to run own SOCKS server. Dante (see <code>danted(8)</code>) which implements server
+as well as client part might be a possible choice.</p>
+<p><strong>Server</strong></p>
+<p>Install package:</p>
+<pre><code>$ sudo apt install dante-server
+</code></pre><p>Configuration file is installed at <code>/etc/danted.conf</code>, possible values are:</p>
+<pre><code>logoutput: syslog
+
+internal: &lt;interface&gt; port = 1080
+external: &lt;interface&gt;
+
+socksmethod: none
+clientmethod: none
+
+user.privileged: proxy
+user.unprivileged: nobody
+user.libwrap: nobody
+
+client pass {
+    from: 0.0.0.0/0 to: 0.0.0.0/0
+    log: connect disconnect error
+}
+
+socks pass {
+    from: 0.0.0.0/0 to: 0.0.0.0/0
+    log: connect disconnect error
+}
+</code></pre><p>Server can be controlled with <code>systemctl</code>.</p>
+<p><strong>Client</strong></p>
+<p>While Dante has client part also, Firefox can directly use SOCKS server. Network Proxy configuration
+can be set in Preferences.</p>
+
+</article>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en"><title>Docker hacks | // pragmatic engineering</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.79.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/index.css">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/classes.css">
+<link rel="canonical" href="https://blog.prgm.xyz/post/docker-hacks/">
+<link rel="alternate" type="application/rss+xml" href="" title="// pragmatic engineering">
+
+<body>
+
+<header class="icons">
+  
+    <a href="https://blog.prgm.xyz">// pragmatic engineering</a>
+  
+  
+  
+</header>
+
+<article>
+  <header>
+    <h1>Docker hacks</h1>
+    <time datetime="2019-07-14T00:00:00Z">July 14, 2019</time>
+  </header>
+  <p><strong>Rename docker volume</strong></p>
+<p>Unfortunately Docker does not directly support volume rename operation. But same result can be achieved
+by copying data from the one volume to the other (assuming <em>source</em> and <em>destination</em> already exist):</p>
+<pre><code>$ docker run --rm -it -v &lt;source&gt;:/from -v &lt;destination&gt;:/to alpine ash -c &quot;cd /from ; cp -av . /to&quot;
+</code></pre><p>Also through the SSH:</p>
+<pre><code>$ ssh &lt;host&gt; 'docker run --rm -v &lt;source&gt;:/from alpine ash -c &quot;tar cf - -C /from .&quot;' | docker run --rm -i -v &lt;destination&gt;:/to alpine ash -c &quot;tar xpf - -C /to&quot;
+</code></pre><p>Late <em>source</em> can be removed.</p>
+<p><strong>Host user in Docker container</strong></p>
+<p>With bind mount, a directory on <em>host</em> machine is mounted into a container. And files in that folder
+created by process from the container will have owner name and group set to that process&rsquo;s name and group
+(such as <em>root</em>).</p>
+<p>Which is inconvenient since host user will not be able to change such files. To avoid this issue user
+with the <em>UID</em> and <em>GID</em> same to host user should exist inside container. Next commands in Dockerfile
+will do that:</p>
+<pre><code>ARG UID
+ARG GID
+
+RUN addgroup --gid $GID host-group
+RUN adduser --disabled-password --gecos &quot;&quot; --uid $UID --gid $GID host-user
+</code></pre><p>Corresponding values should be provided during build:</p>
+<pre><code>$ docker build --build-arg UID=$UID --build-arg GID=$GID .
+</code></pre>
+<p>User with the name <em>host-user</em> will exist inside container. And any files created by this user will look
+exactly the same like created by local user.</p>
+<p><strong>Alternative BASEIMAGE</strong></p>
+<p>Might be useful to build images for more then one CPU architecture with the same Dockerfile. Next commands
+will allow to specify base image during build:</p>
+<pre><code>ARG BASEIMAGE=debian:stretch-slim
+
+FROM $BASEIMAGE
+</code></pre><p>By default, build will use <em>amd64</em> architecture. And to build image for <em>armhf</em> (Raspberry Pi):</p>
+<pre><code>$ docker build --build-arg BASEIMAGE=resin/rpi-raspbian:stretch .
+</code></pre>
+</article>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en"><title>Secure Drone CI with HTTPS-enabled Nginx as reverse proxy | // pragmatic engineering</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.79.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/index.css">
+<link rel="stylesheet" href="https://blog.prgm.xyz/css/classes.css">
+<link rel="canonical" href="https://blog.prgm.xyz/post/drone-nginx-https/">
+<link rel="alternate" type="application/rss+xml" href="" title="// pragmatic engineering">
+
+<body>
+
+<header class="icons">
+  
+    <a href="https://blog.prgm.xyz">// pragmatic engineering</a>
+  
+  
+  
+</header>
+
+<article>
+  <header>
+    <h1>Secure Drone CI with HTTPS-enabled Nginx as reverse proxy</h1>
+    <time datetime="2019-07-12T00:00:00Z">July 12, 2019</time>
+  </header>
+  <p><strong>Prerequisites</strong></p>
+<p>Nginx and Certbot supposed to be installed. If not:</p>
+<pre><code># apt install nginx python-certbot-nginx
+</code></pre>
+<p>Configure and enable Nginx &ldquo;server block&rdquo; (analog of &ldquo;virtual host&rdquo; in Apache):</p>
+<pre><code># vim /etc/nginx/sites-available/example.com
+...
+# ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
+</code></pre>
+<p>To check Nginx configuration before enabling it, run:</p>
+<pre><code># nginx -t
+</code></pre>
+<p><strong>Obtain SSL certificate and reconfigure Nginx</strong></p>
+<p>Just run next command and follow on-screen instruction:</p>
+<pre><code># certbot --nginx -d example.com
+</code></pre>
+<p>After completing, open <em>example.com</em> with the web-browser and check that redirection to HTTPS works.</p>
+<p><strong>Enable reverse proxy for Drone</strong></p>
+<p>Update &ldquo;location /&rdquo; directive in <em>/etc/nginx/sites-available/example.com</em>:</p>
+<pre><code>location / {
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Host $http_host;
+    
+    proxy_pass http://127.0.0.1:8000;
+    proxy_redirect off;
+    proxy_http_version 1.1;
+    proxy_buffering off;
+    
+    chunked_transfer_encoding off;
+}
+</code></pre><p>Restart Nginx and add corresponding port mapping option while starting Drone:</p>
+<pre><code># docker run ... --publish 127.0.0.1:8000:80 ... drone/drone:1
+</code></pre>
+<p><strong>Links</strong></p>
+<ul>
+<li><a href="https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-debian-9">https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-debian-9</a></li>
+<li><a href="https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-debian-9">https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-debian-9</a></li>
+<li><a href="https://0-8-0.docs.drone.io/setup-with-nginx/">https://0-8-0.docs.drone.io/setup-with-nginx/</a></li>
+</ul>
+
+</article>
+
+
+
+</body>
+
+</html>
