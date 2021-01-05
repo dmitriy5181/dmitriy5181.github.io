@@ -7,27 +7,11 @@ steps:
     commands:
       - hugo
 
-  - name: publish
-    image: appleboy/drone-scp
+  - name: publish  
+    image: plugins/gh-pages
     settings:
-      host: prgm.xyz
-      user: pi
-      key:
-        from_secret: ssh_key
-      rm: true
-      strip_components: 1
-      source: "public/*"
-      target: /var/www/blog/public
-
-  - name: notify
-    image: drillster/drone-email
-    settings:
-      from: "Drone CI <drone@prgm.xyz>"
-      host: prgm.xyz
       username:
-        from_secret: email_username
+        from_secret: github_username
       password:
-        from_secret: email_password
-    when:
-      status:
-        - failure
+        from_secret: github_password
+      pages_directory: public/
